@@ -25,7 +25,7 @@ class adminController extends Controller
         return 'User tidak ditemukan';
     }
 
-    public function admin()
+    public function adminDashboard()
     {
         $user = auth()->user();
 
@@ -36,6 +36,21 @@ class adminController extends Controller
 
         // Return view - data bisa diakses langsung di blade via auth()->user()
         return view('admin.dashboard', [
+            'user' => $user,
+        ]);
+    }
+
+    public function userDashboard()
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            abort(401, 'Anda belum login.');
+        }
+
+
+        // Return view - data bisa diakses langsung di blade via auth()->user()
+        return view('user.dashboard', [
             'user' => $user,
         ]);
     }

@@ -22,9 +22,18 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
+// Universal dashboard route yang redirect sesuai role
+Route::get('/dashboard', function () {
+    $user = auth()->user();
+
+    if ($user && $user->hasRole('admin')) {
+        return redirect()->route('admin.dashboard');
+    } elseif ($user && $user->hasRole('user')) {
+        return redirect()->route('user.dashboard');
+    }
+
+    return redirect()->route('login');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -33,37 +42,32 @@ Route::middleware('auth')->group(function () {
 });
 
 
-// Route::get('/admin', function () {
-//     return ('<h1>Halaman - Hanya Admin</h1>');
-// })->middleware(['auth', 'verified', 'role:admin'])->name('admin');
 
 
-Route::get('/dashboard', [adminController::class, 'admin'])
-    ->middleware(['auth', 'verified', 'role:admin'])
-    ->name('dashboard');
+
+// Route khusus admin
+Route::get('/admin', [adminController::class, 'adminDashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('admin.dashboard');
+
+// Route khusus user
+Route::get('/user', [adminController::class, 'userDashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('user.dashboard');
 
 // daftar acara
-Route::get('/list', [adminController::class, 'list'])
+Route::get('list', [adminController::class, 'list'])
     ->middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.acara.list');
 
-Route::get('/admin/acara/create', CreateAcara::class)
+Route::get('admin/acara/create', CreateAcara::class)
     ->middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.acara.create');
 
-// Route::get('/user', function () {
-//     return ('<h1>Halaman - Hanya user</h1>');
-// })->middleware(['auth', 'verified', 'role:user|admin'])->name('user');
 
-// Route::get('/tulisan', function () {
-//     return view('tulisan');
-// })->middleware(['auth', 'verified', 'role_or_permission:event.view|admin'])->name('tulisan');
 
 
 Route::get('/add', [adminController::class, 'addRole'])->name('add');
-
-// Route::get('/cek2', [adminController::class, 'index'])->middleware(['auth', 'permission:view cek2'])->name('cek2');
-
 
 
 

@@ -26,7 +26,6 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
         if (Auth::user()->hasRole('admin')) {
@@ -37,7 +36,6 @@ class AuthenticatedSessionController extends Controller
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }
-
     /**
      * Destroy an authenticated session.
      */
