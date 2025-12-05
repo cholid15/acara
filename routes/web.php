@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\adminController;
 use App\Http\Controllers\cekController;
+use App\Http\Controllers\AcaraController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\CreateAcara;
@@ -46,10 +47,21 @@ Route::middleware('auth')->group(function () {
 
 
 // Route khusus admin
-Route::get('/admin', [adminController::class, 'adminDashboard'])
-    ->middleware(['auth', 'verified'])
-    ->name('admin.dashboard');
+Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
+    Route::get('/', [AdminController::class, 'adminDashboard'])->name('admin.dashboard');
+
+    // ACARA CRUD
+    Route::get('/acara', [AcaraController::class, 'index'])->name('admin.acara.list');
+    Route::get('/acara/create', [AcaraController::class, 'create'])->name('admin.acara.create');
+    Route::post('/acara/store', [AcaraController::class, 'store'])->name('admin.acara.store');
+
+    // <-- pastikan ini ada:
+    Route::get('/acara/unit/{unit_id}/pegawai', [AcaraController::class, 'getPegawaiByUnit']);
+
+    // AJAX: Ambil pegawai berdasarkan unit
+    Route::get('/acara/get-pegawai-by-unit/{unitId}', [AcaraController::class, 'getPegawaiByUnit']);
+});
 // Route khusus user
 Route::get('/user', [adminController::class, 'userDashboard'])
     ->middleware(['auth', 'verified'])
@@ -60,9 +72,9 @@ Route::get('list', [adminController::class, 'list'])
     ->middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.acara.list');
 
-Route::get('admin/acara/create', CreateAcara::class)
-    ->middleware(['auth', 'verified', 'role:admin'])
-    ->name('admin.acara.create');
+// Route::get('admin/acara/create', CreateAcara::class)
+//     ->middleware(['auth', 'verified', 'role:admin'])
+//     ->name('admin.acara.create');
 
 
 

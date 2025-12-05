@@ -20,4 +20,10 @@ class Acara extends Model
         'qr_token',
         'status',
     ];
+
+    // Tambahkan relasi ke AcaraUndangan
+    public function undangan()
+    {
+        return $this->hasMany(AcaraUndangan::class, 'acara_id', 'id');
+    }
 }

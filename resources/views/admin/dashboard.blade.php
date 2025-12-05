@@ -126,7 +126,7 @@
                             </div>
                         </a>
 
-                        <a href="#"
+                        <a href="{{ route('admin.acara.list') }}"
                             class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:shadow-md transition-all duration-200 cursor-pointer">
                             <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
                                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"

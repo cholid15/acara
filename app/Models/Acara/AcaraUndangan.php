@@ -11,6 +11,7 @@ class AcaraUndangan extends Model
 
     protected $fillable = [
         'acara_id',
+        'id_pegawai',
         'user_id',
     ];
 }

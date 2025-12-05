@@ -1,3 +1,78 @@
+@push('styles')
+    <!-- Selectize CSS - Local -->
+    <link rel="stylesheet" href="{{ asset('assets/css/selectize/selectize.bootstrap5.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/jquery-ui/jquery-ui.css') }}">
+@endpush
+
+@push('styles')
+    <!-- Selectize CSS - Local -->
+    <link rel="stylesheet" href="{{ asset('assets/css/selectize/selectize.bootstrap5.css') }}">
+
+    <style>
+        /* Custom Selectize Styling */
+        .selectize-control.multi .selectize-input {
+            border: 1px solid #fcd34d;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            min-height: 45px;
+        }
+
+        .selectize-control.multi .selectize-input.focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .selectize-control.multi .selectize-input>div {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 4px;
+        }
+
+        .selectize-control.multi .selectize-input>div .remove {
+            color: white;
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            padding-left: 6px;
+            margin-left: 6px;
+        }
+
+        .selectize-dropdown {
+            border: 1px solid #fcd34d;
+            border-radius: 0.5rem;
+            margin-top: 4px;
+            z-index: 9999;
+        }
+
+        .selectize-dropdown .option {
+            padding: 0.75rem;
+            border-bottom: 1px solid #fef3c7;
+            cursor: pointer;
+        }
+
+        .selectize-dropdown .option:hover {
+            background-color: #fef3c7;
+        }
+
+        .selectize-dropdown .active {
+            background-color: #fde68a !important;
+            color: #78350f;
+        }
+
+        .selectize-dropdown .option .nama-pegawai {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .selectize-dropdown .option .unit-pegawai {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+    </style>
+@endpush
+
 <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
     {{-- Header Section --}}
     <div class="mb-8">
@@ -21,7 +96,7 @@
     @if (session()->has('success'))
         <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start">
             <svg class="w-5 h-5 text-green-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round     " stroke-width="2"
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
@@ -89,7 +164,7 @@
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </div>
-                        <input type="datetime-local" id="tanggal_waktu" wire:model="tanggal_waktu"
+                        <input type="date" id="tanggal_waktu" wire:model="tanggal_waktu"
                             class="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors duration-200">
                     </div>
                     @error('tanggal_waktu')
@@ -133,7 +208,7 @@
                                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                         </div>
-                        <select wire:model="tipe_audiens" id="tipe_audiens"
+                        <select wire:model.live="tipe_audiens" id="tipe_audiens"
                             class="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors duration-200">
                             <option value="SEMUA_INTERNAL">🏢 Semua Internal</option>
                             <option value="PER_UNIT">🏛️ Per Unit</option>
@@ -153,56 +228,105 @@
                         <label for="filter_unit_id" class="block text-sm font-medium text-blue-900">
                             Pilih Unit <span class="text-red-500">*</span>
                         </label>
-                        <select wire:model="filter_unit_id" id="filter_unit_id"
-                            class="block w-full rounded-lg border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">-- Pilih Unit --</option>
-                            @foreach ($unit as $u)
-                                <option value="{{ $u->id }}">{{ $u->nama_unit }}</option>
-                            @endforeach
-                        </select>
+
+                        <div class="mb-2">
+                            <input type="text" wire:model.live.debounce.300ms="searchUnit"
+                                placeholder="🔍 Cari unit (level 1)..."
+                                class="w-full rounded-lg border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm" />
+                        </div>
+
+                        <div class="relative">
+                            <select wire:model="filter_unit_id" id="filter_unit_id"
+                                class="block w-full rounded-lg border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="">-- Pilih Unit --</option>
+                                @forelse ($unit as $u)
+                                    <option value="{{ $u->id }}">{{ $u->nama }}</option>
+                                @empty
+                                    <option disabled>-- Tidak ada unit ditemukan --</option>
+                                @endforelse
+                            </select>
+
+                            <div class="absolute right-3 top-2" wire:loading
+                                wire:target="searchUnit,loadUnits,updatedTipeAudiens">
+                                <svg class="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10"
+                                        stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                            </div>
+                        </div>
+
                         @error('filter_unit_id')
                             <p class="text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 @endif
 
-                {{-- Pilih Pegawai (jika KHUSUS) --}}
+                {{-- Pilih Pegawai dengan Selectize (jika KHUSUS) --}}
                 @if ($tipe_audiens == 'KHUSUS')
                     <div
-                        class="space-y-2 bg-yellow-50 p-4 rounded-lg border border-yellow-200 transition-all duration-300">
-                        <label class="block text-sm font-medium text-yellow-900">
+                        class="space-y-3 bg-yellow-50 p-4 rounded-lg border border-yellow-200 transition-all duration-300">
+                        <label for="pegawaiSelect" class="block text-sm font-medium text-yellow-900">
                             Pilih Pegawai <span class="text-red-500">*</span>
                         </label>
                         <p class="text-xs text-yellow-700 mb-2">
-                            💡 Tahan tombol Ctrl (Windows) atau Cmd (Mac) untuk memilih lebih dari satu
+                            💡 Ketik untuk mencari pegawai, klik untuk memilih (bisa lebih dari satu)
                         </p>
 
-                        {{-- Search Box --}}
+                        {{-- Live Search Input --}}
                         <div class="mb-3">
-                            <input type="text" placeholder="🔍 Cari pegawai..."
-                                class="w-full rounded-lg border-yellow-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 text-sm"
-                                id="searchPegawai">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <input type="text" wire:model.live.debounce.300ms="searchPegawai"
+                                    placeholder="🔍 Ketik nama pegawai untuk mencari..."
+                                    class="pl-10 pr-10 w-full rounded-lg border-yellow-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 text-sm" />
+                                <div class="absolute right-3 top-2.5" wire:loading
+                                    wire:target="searchPegawai,loadPegawai">
+                                    <svg class="animate-spin h-5 w-5 text-yellow-600" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10"
+                                            stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
 
-                        <div
-                            class="border border-yellow-300 rounded-lg overflow-hidden bg-white max-h-64 overflow-y-auto">
-                            <select multiple wire:model="selectedPegawai" id="pegawaiSelect"
-                                class="block w-full border-0 focus:ring-0 min-h-[200px]" size="8">
+                        {{-- Selectize Element --}}
+                        <div wire:ignore>
+                            <select id="pegawaiSelect" multiple>
                                 @foreach ($pegawai as $p)
-                                    <option value="{{ $p->id }}"
-                                        class="py-2 px-3 hover:bg-yellow-100 cursor-pointer">
-                                        {{ $p->orang->nama }} — {{ $p->unit->nama_unit }}
+                                    <option value="{{ $p->id }}">
+                                        {{ optional($p->orang)->nama ?? '—' }} — {{ optional($p->unit)->nama ?? '—' }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <div class="mt-2 text-sm text-yellow-700">
-                            <span class="font-semibold">{{ count($selectedPegawai) }}</span> pegawai dipilih
+                        {{-- Counter Pegawai Dipilih --}}
+                        <div class="mt-3 p-3 bg-white rounded-lg border border-yellow-300">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-yellow-700">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    Pegawai dipilih:
+                                </span>
+                                <span class="font-bold text-lg text-yellow-900">{{ count($selectedPegawai) }}</span>
+                            </div>
                         </div>
 
                         @error('selectedPegawai')
-                            <p class="text-sm text-red-600">{{ $message }}</p>
+                            <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
                         @enderror
                     </div>
                 @endif
@@ -241,7 +365,7 @@
 
                 <button type="submit"
                     class="inline-flex items-center px-6 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <span wire:loading.remove wire:target="save">Simpan Acara</span>
@@ -259,28 +383,177 @@
             </div>
         </form>
     </div>
+</div>
 
-    {{-- Simple Search Filter Script --}}
+@push('scripts')
+    <!-- Load Selectize only (jQuery already loaded in layout).
+                 Jika kamu tidak yakin selectize file ada, gunakan CDN versi fallback di bawah -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchPegawai');
+        // if local file exists, inject it; otherwise fallback to CDN
+        (function() {
+            function loadScript(src, cb) {
+                var s = document.createElement('script');
+                s.src = src;
+                s.onload = cb;
+                s.onerror = function() {
+                    console.warn('Failed loading', src);
+                    cb(new Error('load error'));
+                };
+                document.head.appendChild(s);
+            }
+
+            // try local first
+            var local = "{{ asset('assets/js/selectize/selectize.min.js') }}";
+            loadScript(local, function(err) {
+                if (err) {
+                    // fallback CDN
+                    loadScript(
+                        'https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js',
+                        function() {
+                            console.log('Selectize loaded from CDN fallback');
+                        });
+                } else {
+                    console.log('Selectize loaded (local)');
+                }
+            });
+        })();
+    </script>
+
+    <script>
+        // safe initializer - wait for selectize plugin ready
+        function safeInitSelectizeRetry(maxRetries = 10, interval = 150) {
+            let tries = 0;
+
+            function attempt() {
+                tries++;
+                if (window.jQuery && typeof jQuery.fn.selectize === 'function') {
+                    initSelectize();
+                } else if (tries < maxRetries) {
+                    console.log('[Selectize] plugin not ready, retry', tries);
+                    setTimeout(attempt, interval);
+                } else {
+                    console.error('[Selectize] plugin not available after retries');
+                }
+            }
+
+            attempt();
+        }
+
+        let selectizeInstance = null;
+
+        function initSelectize() {
+            console.log('[Selectize] initSelectize called');
+
             const selectElement = document.getElementById('pegawaiSelect');
+            if (!selectElement) {
+                console.warn('[Selectize] #pegawaiSelect not found, skipping init');
+                return;
+            }
 
-            if (searchInput && selectElement) {
-                searchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    const options = selectElement.options;
+            // destroy existing instance safely
+            try {
+                if (selectElement.selectize) {
+                    selectElement.selectize.destroy();
+                }
+                // jQuery-backed instance
+                if (jQuery && jQuery.fn && jQuery.fn.selectize && jQuery('#pegawaiSelect')[0] && jQuery('#pegawaiSelect')[0]
+                    .selectize) {
+                    jQuery('#pegawaiSelect')[0].selectize.destroy();
+                }
+            } catch (e) {
+                // ignore destroy errors
+                console.warn('[Selectize] destroy error', e);
+            }
 
-                    for (let i = 0; i < options.length; i++) {
-                        const optionText = options[i].text.toLowerCase();
-                        if (optionText.includes(searchTerm)) {
-                            options[i].style.display = '';
-                        } else {
-                            options[i].style.display = 'none';
-                        }
+            // Ensure plugin is present
+            if (!window.jQuery || typeof jQuery.fn.selectize !== 'function') {
+                console.error('[Selectize] selectize plugin not available');
+                return;
+            }
+
+            // Initialize
+            selectizeInstance = jQuery('#pegawaiSelect').selectize({
+                plugins: ['remove_button'],
+                maxItems: null,
+                valueField: 'value',
+                labelField: 'text',
+                searchField: ['text'],
+                create: false,
+                hideSelected: true,
+                closeAfterSelect: false,
+                render: {
+                    option: function(item, escape) {
+                        // item.text expected "Name — Unit"
+                        const parts = (item.text || '').split(' — ');
+                        return `<div class="py-2 px-3">
+                                    <div class="nama-pegawai">${escape(parts[0]||item.text||'')}</div>
+                                    <div class="unit-pegawai text-xs">${escape(parts[1]||'')}</div>
+                                </div>`;
+                    },
+                    item: function(item, escape) {
+                        return `<div>${escape((item.text||'').split(' — ')[0]||item.text||'')}</div>`;
                     }
+                },
+                onChange: function(value) {
+                    // normalize to array
+                    let selected = [];
+                    if (typeof value === 'string') {
+                        selected = value ? value.split(',').filter(v => v !== '') : [];
+                    } else if (Array.isArray(value)) {
+                        selected = value;
+                    }
+                    // update Livewire property
+                    if (window.Livewire) {
+                        Livewire.emit('pegawai-selected', selected);
+                    }
+                }
+            })[0].selectize;
+
+            // add options from DOM (if any) so selectize shows them
+            const options = [];
+            Array.from(selectElement.options).forEach(opt => {
+                if (opt.value && opt.value !== '') {
+                    options.push({
+                        value: opt.value,
+                        text: opt.text
+                    });
+                }
+            });
+            if (options.length) {
+                selectizeInstance.addOption(options);
+                selectizeInstance.refreshOptions(false);
+            }
+
+            // set initial selection if server provided values
+            try {
+                const initial = @json($selectedPegawai ?? []);
+                if (initial && initial.length) {
+                    selectizeInstance.setValue(initial, true);
+                }
+            } catch (e) {
+                console.warn('[Selectize] cannot set initial values', e);
+            }
+
+            console.log('[Selectize] initialized');
+        }
+
+        // Initialize safely on load and after Livewire renders
+        document.addEventListener('DOMContentLoaded', function() {
+            safeInitSelectizeRetry(20, 150); // try for a few times
+        });
+
+        document.addEventListener('livewire:load', function() {
+            // when Livewire ready, also ensure plugin is initialized or retried
+            safeInitSelectizeRetry(20, 150);
+            // hook to Livewire message processed to re-init after DOM updates
+            if (window.Livewire && Livewire.hook) {
+                Livewire.hook('message.processed', (message, component) => {
+                    // small delay to ensure DOM inserted
+                    setTimeout(() => {
+                        safeInitSelectizeRetry(10, 120);
+                    }, 80);
                 });
             }
         });
     </script>
-</div>
+@endpush
