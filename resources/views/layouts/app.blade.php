@@ -23,6 +23,10 @@
     <!-- jQuery UI CSS (Opsional, jika dipakai) -->
     <link rel="stylesheet" href="{{ asset('assets/css/jquery-ui/jquery-ui.min.css') }}">
 
+    {{-- sweetalert2 --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/sweetalert/sweetalert2.min.css') }}">
+
+
     <!-- Additional Styles from Pages -->
     @stack('styles')
 
@@ -51,8 +55,8 @@
 
     <!-- jQuery UI JS (Opsional, jika dipakai) -->
     <script src="{{ asset('assets/js/jquery-ui/jquery-ui.min.js') }}"></script>
-
-
+    {{-- sweetalert2 --}}
+    <script src="{{ asset('assets/js/sweetalert/sweetalert2.min.js') }}"></script>
 
     <!-- Additional Scripts from Pages -->
     @stack('scripts')

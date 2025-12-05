@@ -35,7 +35,8 @@
 
         {{-- FORM --}}
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-            <form action="{{ route('admin.acara.store') }}" method="POST">
+            <form id="formAcara" method="POST">
+
                 @csrf
 
                 <div class="p-6 space-y-6">
@@ -49,7 +50,8 @@
                     {{-- Tanggal Waktu --}}
                     <div>
                         <label class="text-sm font-medium text-gray-700">Tanggal & Waktu *</label>
-                        <input type="date" name="tanggal_waktu" required class="mt-1 w-full border-gray-300 rounded-lg">
+                        <input type="datetime-local" name="tanggal_waktu" required
+                            class="mt-1 w-full border-gray-300 rounded-lg">
                     </div>
 
                     {{-- Lokasi --}}
