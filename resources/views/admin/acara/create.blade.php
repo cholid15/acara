@@ -130,52 +130,7 @@
 @endpush
 
 @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+    <script src="{{ asset('assets/js/selectize/selectize.js') }}"></script>
 
-    <script>
-        $(document).ready(function() {
-
-            // INIT SELECTIZE
-            let pegawaiSelect = $('#pegawaiSelect').selectize({
-                plugins: ['remove_button'],
-                placeholder: "Pilih pegawai..."
-            });
-            let pegawaiControl = pegawaiSelect[0].selectize;
-
-            // Tampilkan bagian sesuai tipe audiens
-            $('#tipe_audiens').on('change', function() {
-                let val = $(this).val();
-
-                $('#section_unit').addClass('hidden');
-                $('#section_pegawai').addClass('hidden');
-
-                if (val === 'PER_UNIT') {
-                    $('#section_unit').removeClass('hidden');
-                } else if (val === 'KHUSUS') {
-                    $('#section_pegawai').removeClass('hidden');
-                }
-            });
-
-            // AJAX → Load pegawai by unit
-            $('#unitSelect').on('change', function() {
-                let unitId = $(this).val();
-                if (!unitId) return;
-
-                $.get('/admin/acara/get-pegawai-by-unit/' + unitId, function(res) {
-                    pegawaiControl.clear();
-                    pegawaiControl.clearOptions();
-
-                    res.forEach(function(item) {
-                        pegawaiControl.addOption({
-                            value: item.value,
-                            text: item.text
-                        });
-                    });
-
-                    pegawaiControl.refreshOptions();
-                });
-            });
-
-        });
-    </script>
+    <script src="{{ asset('assets/js/acara/acara.js') }}"></script>
 @endpush
