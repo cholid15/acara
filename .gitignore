@@ -20,4 +20,9 @@ yarn-error.log
 
 *READMEy
 
+# Ignore semua isi public
 /public/*
+
+# Kecualikan public/assets dan semua isinya
+!/public/assets/
+!/public/assets/**
