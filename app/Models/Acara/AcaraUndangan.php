@@ -14,4 +14,10 @@ class AcaraUndangan extends Model
         'id_pegawai',
         'user_id',
     ];
+
+
+    public function pegawai()
+    {
+        return $this->belongsTo(\App\Models\Ref\Pegawai::class, 'id_pegawai', 'id');
+    }
 }

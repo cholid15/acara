@@ -35,7 +35,7 @@
 
         {{-- FORM --}}
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-            <form id="formAcara" method="POST">
+            <form id="formAcara" method="POST" action="{{ route('admin.acara.store') }}">
 
                 @csrf
 
@@ -74,7 +74,7 @@
                     {{-- PER UNIT → Pilih Unit --}}
                     <div id="section_unit" class="hidden">
                         <label class="text-sm font-medium text-gray-700">Pilih Unit *</label>
-                        <select id="unitSelect" class="mt-1 w-full border-gray-300 rounded-lg">
+                        <select id="unitSelect" name="unit_id" class="mt-1 w-full border-gray-300 rounded-lg">
                             <option value="">-- Pilih Unit --</option>
                             @foreach ($unit as $u)
                                 <option value="{{ $u->id }}">{{ $u->nama }}</option>
@@ -117,7 +117,7 @@
 
                 {{-- Submit --}}
                 <div class="px-6 py-4 bg-gray-50 border-t flex justify-end">
-                    <button class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                    <button type="submit" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
                         Simpan Acara
                     </button>
                 </div>

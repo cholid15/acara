@@ -282,7 +282,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex items-center space-x-2">
-                                            <a href="" {{-- <a href="{{ route('admin.acara.show', $item->id) }}" --}}
+                                            <a href="javascript:void(0)" onclick="showDetail({{ $item->id }})"
                                                 class="text-indigo-600 hover:text-indigo-900 transition"
                                                 title="Lihat Detail">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
@@ -294,6 +294,7 @@
                                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </a>
+
                                             <a href="" {{-- <a href="{{ route('admin.acara.edit', $item->id) }}" --}}
                                                 class="text-yellow-600 hover:text-yellow-900 transition"
                                                 title="Edit">
@@ -370,4 +371,116 @@
             </div>
         </div>
     </div>
+
+    <div id="modalDetail" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div class="bg-white w-11/12 lg:w-3/4 xl:w-1/2 rounded-lg shadow-lg">
+            <div class="p-5 border-b">
+                <h3 class="text-xl font-semibold">Detail Acara</h3>
+            </div>
+
+            <div id="modalBody" class="p-5 max-h-[70vh] overflow-y-auto">
+                Loading...
+            </div>
+
+            <div class="p-4 border-t text-right">
+                <button onclick="closeDetail()" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-800">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function showDetail(id) {
+
+            // tampilkan dulu modal + loading
+            document.getElementById('modalDetail').classList.remove('hidden');
+            document.getElementById('modalBody').innerHTML = "<div class='text-center py-6'>Loading...</div>";
+
+            fetch(`/admin/acara/detail/${id}`)
+                .then(res => res.json())
+                .then(res => {
+
+                    if (!res.success) return;
+
+                    let acara = res.data;
+
+                    let html = `
+                <div class="space-y-4">
+
+                    <div>
+                        <h4 class="font-bold text-lg">${acara.nama_acara}</h4>
+                        <p class="text-sm text-gray-500">${acara.tanggal_waktu}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div><b>Lokasi:</b> ${acara.lokasi}</div>
+                        <div><b>Tipe Audiens:</b> ${acara.tipe_audiens}</div>
+                        <div><b>Status:</b> ${acara.status}</div>
+                        <div><b>QR Token:</b> ${acara.qr_token}</div>
+                    </div>
+
+                    {{-- QR Code Section --}}
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg text-center">
+                        <h4 class="font-semibold mb-3">QR Code</h4>
+            `;
+
+                    // 🔹 Tampilkan QR image atau fallback message
+                    if (acara.qr_image_url) {
+                        html +=
+                            `<img src="${acara.qr_image_url}" alt="QR Code" class="w-48 h-48 mx-auto border border-gray-300 rounded" />`;
+                    } else {
+                        html += `<div class="p-6 bg-yellow-50 border border-yellow-200 rounded text-yellow-700 text-sm">
+                            <p>⚠️ Tidak ada QR Code</p>
+                        </div>`;
+                    }
+
+                    html += `
+                    </div>
+            `;
+
+                    // Jika khusus, tampilkan daftar undangan
+                    if (acara.tipe_audiens === 'KHUSUS') {
+
+                        html += `
+                    <div class="mt-6">
+                        <h4 class="font-semibold mb-2">Daftar Undangan</h4>
+                        <table class="w-full text-sm border">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="p-2 border">Nama Pegawai</th>
+                                    <th class="p-2 border">Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                        acara.undangan.forEach(u => {
+                            html += `
+                    <tr>
+                        <td class="p-2 border">${u.pegawai?.orang?.nama ?? '-'}</td>
+                        <td class="p-2 border">${u.pegawai?.unit?.nama ?? '-'}</td>
+                    </tr>
+                    `;
+                        });
+
+                        html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                    }
+
+                    html += `</div>`;
+
+                    document.getElementById('modalBody').innerHTML = html;
+                });
+        }
+
+        function closeDetail() {
+            document.getElementById('modalDetail').classList.add('hidden');
+        }
+    </script>
+
 </x-app-layout>

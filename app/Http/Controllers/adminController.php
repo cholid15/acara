@@ -85,6 +85,8 @@ class adminController extends Controller
 
         // Pagination
         $acara = $query->paginate(10);
+        // dd($acara);
+        // die;
 
         // Statistics
         $stats = [
@@ -95,5 +97,21 @@ class adminController extends Controller
         ];
 
         return view('admin.acara.list', compact('acara', 'stats'));
+    }
+
+
+    public function detail($id)
+    {
+        $acara = Acara::with([
+            'undangan',
+            'undangan.pegawai',
+            'undangan.pegawai.orang',
+            'undangan.pegawai.unit'
+        ])->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $acara
+        ]);
     }
 }

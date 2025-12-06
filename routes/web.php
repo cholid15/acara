@@ -50,27 +50,29 @@ Route::middleware('auth')->group(function () {
 Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
     Route::get('/', [AdminController::class, 'adminDashboard'])->name('admin.dashboard');
+    Route::get('/acara', [AdminController::class, 'list'])->name('admin.acara.list');
 
     // ACARA CRUD
-    Route::get('/acara', [AcaraController::class, 'index'])->name('admin.acara.list');
     Route::get('/acara/create', [AcaraController::class, 'create'])->name('admin.acara.create');
     Route::post('/acara/store', [AcaraController::class, 'store'])->name('admin.acara.store');
-
     // <-- pastikan ini ada:
     Route::get('/acara/unit/{unit_id}/pegawai', [AcaraController::class, 'getPegawaiByUnit']);
-
     // AJAX: Ambil pegawai berdasarkan unit
     Route::get('/acara/get-pegawai-by-unit/{unitId}', [AcaraController::class, 'getPegawaiByUnit']);
+
+    // detail acara
+    Route::get('acara/detail/{id}', [\App\Http\Controllers\AcaraController::class, 'detail'])
+        ->name('admin.acara.detail');
 });
 // Route khusus user
-Route::get('/user', [adminController::class, 'userDashboard'])
-    ->middleware(['auth', 'verified'])
-    ->name('user.dashboard');
+// Route::get('/user', [adminController::class, 'userDashboard'])
+//     ->middleware(['auth', 'verified'])
+//     ->name('user.dashboard');
 
 // daftar acara
-Route::get('list', [adminController::class, 'list'])
-    ->middleware(['auth', 'verified', 'role:admin'])
-    ->name('admin.acara.list');
+// Route::get('list', [adminController::class, 'list'])
+//     ->middleware(['auth', 'verified', 'role:admin'])
+//     ->name('admin.acara.list');
 
 // Route::get('admin/acara/create', CreateAcara::class)
 //     ->middleware(['auth', 'verified', 'role:admin'])
