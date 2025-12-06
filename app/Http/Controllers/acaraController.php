@@ -52,7 +52,7 @@ class AcaraController extends Controller
 
 
 
-    public function store(Request $request)
+    public function storebackup(Request $request)
     {
         $request->validate([
             'nama_acara'     => 'required|string',
@@ -186,6 +186,83 @@ class AcaraController extends Controller
             ->with('success', 'Acara berhasil dibuat!');
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama_acara'     => 'required|string',
+            'tanggal_waktu'  => 'required|date',
+            'lokasi'         => 'required|string',
+            'tipe_audiens'   => 'required',
+            'pegawai'        => 'array'
+        ]);
+
+        $acara = Acara::create([
+            'nama_acara'    => $request->nama_acara,
+            'tanggal_waktu' => $request->tanggal_waktu,
+            'lokasi'        => $request->lokasi,
+            'tipe_audiens'  => $request->tipe_audiens,
+            'qr_token'      => Str::uuid(),
+        ]);
+
+        /* ===============================================================
+       GENERATE QR CODE LANGSUNG KE /public/qrcodes/ (tanpa storage)
+        ================================================================*/
+        try {
+
+            // Pastikan folder public/qrcodes ada
+            $publicQRPath = public_path('qrcodes');
+            if (!file_exists($publicQRPath)) {
+                mkdir($publicQRPath, 0755, true);
+            }
+
+            // URL yang di-encode
+            $qrUrl = url("/acara/qr/{$acara->qr_token}");
+
+            // Options QR
+            $options = new QROptions([
+                'version'          => QRCode::VERSION_AUTO,
+                'outputType'       => QRCode::OUTPUT_IMAGE_PNG,
+                'eccLevel'         => QRCode::ECC_H,
+                'scale'            => 10,
+                'imageBase64'      => false,
+            ]);
+
+            $qrcode = new QRCode($options);
+            $png = $qrcode->render($qrUrl);
+
+            if (empty($png)) {
+                throw new \Exception("QR Code creation failed");
+            }
+
+            // Simpan ke public/qrcodes
+            $filename = $acara->qr_token . '.png';
+            $savePath = $publicQRPath . DIRECTORY_SEPARATOR . $filename;
+
+            file_put_contents($savePath, $png);
+
+            if (!file_exists($savePath)) {
+                throw new \Exception("QR Code not saved to public path");
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['qr_error' => 'QR gagal dibuat: ' . $e->getMessage()]);
+        }
+
+        /* ===============================================================
+       SIMPAN UNDANGAN
+     ================================================================*/
+        if ($request->pegawai) {
+            foreach ($request->pegawai as $pegawaiID) {
+                AcaraUndangan::create([
+                    'acara_id'   => $acara->id,
+                    'id_pegawai' => $pegawaiID
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.acara.create')
+            ->with('success', 'Acara berhasil dibuat!');
+    }
+
 
     /**
      * Halaman Edit (dipanggil via AJAX)
@@ -263,11 +340,14 @@ class AcaraController extends Controller
 
         // Nama file QR
         $filename = $acara->qr_token . '.png';
-        $path = "qrcodes/{$filename}";
+        $relativePath = "qrcodes/{$filename}";  // disimpan di public/qrcodes/xxx.png
+        $fullPath = public_path($relativePath);
 
-        // Jika file ada → ambil URL publik melalui Storage::url()
-        if (Storage::disk('public')->exists($path)) {
-            $acara->qr_image_url = Storage::url($path);  // otomatis --> /storage/qrcodes/xxx.png
+        // cek file di public/qrcodes
+        if (file_exists($fullPath)) {
+
+            // URL publik (tanpa storage)
+            $acara->qr_image_url = url($relativePath);
         } else {
             $acara->qr_image_url = null;
         }
@@ -276,5 +356,35 @@ class AcaraController extends Controller
             'success' => true,
             'data'    => $acara
         ]);
+    }
+
+
+    public function destroy($id)
+    {
+        // Cari acara
+        $acara = Acara::find($id);
+        if (!$acara) {
+            return response()->json(['success' => false, 'message' => 'Data acara tidak ditemukan.'], 404);
+        }
+
+        try {
+            // Hapus file QR dari public/qrcodes jika ada
+            $filename = $acara->qr_token . '.png';
+            $publicPath = public_path("qrcodes/{$filename}");
+            if (file_exists($publicPath)) {
+                @unlink($publicPath);
+            }
+
+            // Hapus undangan terkait
+            AcaraUndangan::where('acara_id', $acara->id)->delete();
+
+            // Hapus record acara
+            $acara->delete();
+
+            return response()->json(['success' => true, 'message' => 'Acara dan QR berhasil dihapus.']);
+        } catch (\Exception $e) {
+            Log::error('Failed to delete acara ID ' . $id . ': ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal menghapus acara: ' . $e->getMessage()], 500);
+        }
     }
 }

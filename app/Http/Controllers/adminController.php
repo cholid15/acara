@@ -33,10 +33,13 @@ class adminController extends Controller
             abort(401, 'Anda belum login.');
         }
 
+        // Ambil data acara berurutan dari terbaru + pagination
+        $acara = Acara::orderBy('created_at', 'desc')->paginate(2);
 
         // Return view - data bisa diakses langsung di blade via auth()->user()
         return view('admin.dashboard', [
             'user' => $user,
+            'acara' => $acara,
         ]);
     }
 
@@ -84,7 +87,7 @@ class adminController extends Controller
         }
 
         // Pagination
-        $acara = $query->paginate(10);
+        $acara = $query->paginate(2);
         // dd($acara);
         // die;
 

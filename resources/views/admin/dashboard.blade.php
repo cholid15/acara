@@ -207,120 +207,59 @@
                                     </th>
                                 </tr>
                             </thead>
+
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            Seminar Teknologi 2025
-                                        </div>
-                                        <div class="text-xs text-gray-500">
-                                            SEMUA_INTERNAL
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        15 Des 2025
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        Auditorium Lt. 3
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            AKTIF
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            Workshop Digital Marketing
-                                        </div>
-                                        <div class="text-xs text-gray-500">
-                                            PER_UNIT
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        18 Des 2025
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        Ruang Meeting A
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            AKTIF
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            Gathering Akhir Tahun
-                                        </div>
-                                        <div class="text-xs text-gray-500">
-                                            KHUSUS
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        20 Des 2025
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        Hotel Grand Semarang
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            AKTIF
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            Pelatihan Safety K3
-                                        </div>
-                                        <div class="text-xs text-gray-500">
-                                            SEMUA_INTERNAL
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        22 Des 2025
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        Ruang Training Lt. 2
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            AKTIF
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            Town Hall Meeting Q4
-                                        </div>
-                                        <div class="text-xs text-gray-500">
-                                            PUBLIK
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        28 Des 2025
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        Main Hall
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                            DRAFT
-                                        </span>
-                                    </td>
-                                </tr>
+                                @forelse ($acara as $a)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {{ $a->nama_acara }}
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                {{ $a->tipe_audiens }}
+                                            </div>
+                                        </td>
+
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ \Carbon\Carbon::parse($a->tanggal_waktu)->format('d M Y') }}
+                                        </td>
+
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ $a->lokasi }}
+                                        </td>
+
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @php
+                                                $warna =
+                                                    $a->status === 'AKTIF'
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-gray-100 text-gray-800';
+                                            @endphp
+                                            <span
+                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $warna }}">
+                                                {{ $a->status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                            Belum ada acara.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
+
+                    {{-- Pagination --}}
+                    @if ($acara->hasPages())
+                        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                            {{ $acara->links() }}
+                        </div>
+                    @endif
+
                 </div>
             </div>
 

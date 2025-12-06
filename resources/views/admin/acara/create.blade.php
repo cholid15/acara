@@ -35,7 +35,7 @@
 
         {{-- FORM --}}
         <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-            <form id="formAcara" method="POST" action="{{ route('admin.acara.store') }}">
+            <form id="formAcara">
 
                 @csrf
 

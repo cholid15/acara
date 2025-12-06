@@ -69,6 +69,10 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->group(fu
     // detail acara
     Route::get('acara/detail/{id}', [\App\Http\Controllers\AcaraController::class, 'detail'])
         ->name('admin.acara.detail');
+
+
+    Route::delete('/acara/{id}', [AcaraController::class, 'destroy'])
+        ->name('admin.acara.destroy');
 });
 // Route khusus user
 // Route::get('/user', [adminController::class, 'userDashboard'])

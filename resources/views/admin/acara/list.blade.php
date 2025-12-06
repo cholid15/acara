@@ -304,9 +304,11 @@
                                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
                                             </a>
-                                            <a href="" {{-- <a href="{{ route('admin.acara.qr-code', $item->id) }}" --}}
+                                            <!-- QR icon: panggil JS openQr(id) -->
+                                            <a href="javascript:void(0)" onclick="openQr({{ $item->id }})"
                                                 class="text-green-600 hover:text-green-900 transition"
                                                 title="QR Code">
+                                                <!-- svg sama seperti sebelumnya -->
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -314,14 +316,15 @@
                                                         d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                                                 </svg>
                                             </a>
-                                            {{-- <form action="{{ route('admin.acara.destroy', $item->id) }}" --}}
-                                            <form method="POST" class="inline"
-                                                onsubmit="return confirm('Yakin ingin menghapus acara ini?')">
 
+                                            <!-- Hapus: gunakan button yang memanggil JS deleteWithConfirm(id) -->
+                                            <form method="POST" class="inline" onsubmit="return false;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit"
+                                                <button type="button"
+                                                    onclick="deleteWithConfirm({{ $item->id }})"
                                                     class="text-red-600 hover:text-red-900 transition" title="Hapus">
+                                                    <!-- svg trash -->
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -330,6 +333,7 @@
                                                     </svg>
                                                 </button>
                                             </form>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -389,8 +393,6 @@
         </div>
     </div>
 
-
-
     <!-- ===================================================================== -->
     <!-- BLADE VIEW (list.blade.php) - Tambahan Modal EDIT -->
     <!-- ===================================================================== -->
@@ -433,6 +435,31 @@
     </div>
 
 
+    <!-- Modal QR -->
+    <div id="modalQr" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div class="bg-white w-11/12 sm:w-3/4 md:w-1/2 rounded-lg shadow-lg overflow-hidden">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="text-lg font-semibold">QR Code</h3>
+                <button onclick="closeQr()" class="text-gray-600 hover:text-gray-900">&times;</button>
+            </div>
+
+            <div id="modalQrBody" class="p-6 text-center">
+                <div id="modalQrLoading" class="py-6">Loading...</div>
+                <div id="modalQrContent" class="hidden">
+                    <img id="modalQrImage" src="" alt="QR Code" class="mx-auto border rounded"
+                        style="width:200px;height:200px" />
+                    <div class="mt-4 flex items-center justify-center space-x-3">
+                        <a id="modalQrDownload" href="#" download
+                            class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Download</a>
+                        <button onclick="closeQr()"
+                            class="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-800">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         function showDetail(id) {
 
@@ -449,69 +476,79 @@
                     let acara = res.data;
 
                     let html = `
-                <div class="space-y-4">
+            <div class="space-y-4">
 
-                    <div>
-                        <h4 class="font-bold text-lg">${acara.nama_acara}</h4>
-                        <p class="text-sm text-gray-500">${acara.tanggal_waktu}</p>
-                    </div>
+                <div>
+                    <h4 class="font-bold text-lg">${acara.nama_acara}</h4>
+                    <p class="text-sm text-gray-500">${acara.tanggal_waktu}</p>
+                </div>
 
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div><b>Lokasi:</b> ${acara.lokasi}</div>
-                        <div><b>Tipe Audiens:</b> ${acara.tipe_audiens}</div>
-                        <div><b>Status:</b> ${acara.status}</div>
-                        <div><b>QR Token:</b> ${acara.qr_token}</div>
-                    </div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div><b>Lokasi:</b> ${acara.lokasi}</div>
+                    <div><b>Tipe Audiens:</b> ${acara.tipe_audiens}</div>
+                    <div><b>Status:</b> ${acara.status}</div>
+                    <div><b>QR Token:</b> ${acara.qr_token}</div>
+                </div>
 
-                    {{-- QR Code Section --}}
-                    <div class="mt-6 p-4 bg-gray-50 rounded-lg text-center">
-                        <h4 class="font-semibold mb-3">QR Code</h4>
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg text-center">
+                    <h4 class="font-semibold mb-3">QR Code</h4>
             `;
 
-                    // 🔹 Tampilkan QR image atau fallback message
+                    // ==============================
+                    // FIX PENENTUAN URL QR IMAGE
+                    // ==============================
                     if (acara.qr_image_url) {
-                        html +=
-                            `<img src="${acara.qr_image_url}" alt="QR Code" class="w-48 h-48 mx-auto border border-gray-300 rounded" />`;
+
+                        // convert ke URL absolut
+                        let fullUrl = acara.qr_image_url.startsWith('http') ?
+                            acara.qr_image_url :
+                            window.location.origin + '/' + acara.qr_image_url.replace(/^\/+/, '');
+
+                        html += `
+                    <img src="${fullUrl}" alt="QR Code"
+                         class="w-48 h-48 mx-auto border border-gray-300 rounded" />
+                `;
                     } else {
-                        html += `<div class="p-6 bg-yellow-50 border border-yellow-200 rounded text-yellow-700 text-sm">
-                            <p>⚠️ Tidak ada QR Code</p>
-                        </div>`;
+                        html += `
+                <div class="p-6 bg-yellow-50 border border-yellow-200 rounded text-yellow-700 text-sm">
+                    <p>⚠️ Tidak ada QR Code</p>
+                </div>`;
                     }
 
                     html += `
-                    </div>
+            </div>
             `;
 
-                    // Jika khusus, tampilkan daftar undangan
+                    // Jika tipe khusus → tampilkan undangan
                     if (acara.tipe_audiens === 'KHUSUS') {
 
                         html += `
-                    <div class="mt-6">
-                        <h4 class="font-semibold mb-2">Daftar Undangan</h4>
-                        <table class="w-full text-sm border">
-                            <thead>
-                                <tr class="bg-gray-100">
-                                    <th class="p-2 border">Nama Pegawai</th>
-                                    <th class="p-2 border">Unit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
+                        <div class="mt-6">
+                            <h4 class="font-semibold mb-2">Daftar Undangan</h4>
+                            <table class="w-full text-sm border">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="p-2 border">Nama Pegawai</th>
+                                        <th class="p-2 border">Unit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            `;
 
                         acara.undangan.forEach(u => {
                             html += `
-                    <tr>
-                        <td class="p-2 border">${u.pegawai?.orang?.nama ?? '-'}</td>
-                        <td class="p-2 border">${u.pegawai?.unit?.nama ?? '-'}</td>
-                    </tr>
-                    `;
+                            <tr>
+                                <td class="p-2 border">${u.pegawai?.orang?.nama ?? '-'}</td>
+                                <td class="p-2 border">${u.pegawai?.unit?.nama ?? '-'}</td>
+                            </tr>
+                            `;
                         });
 
                         html += `
-                            </tbody>
-                        </table>
-                    </div>
-                `;
+                                </tbody>
+                            </table>
+                        </div>
+                        `;
                     }
 
                     html += `</div>`;
@@ -519,6 +556,7 @@
                     document.getElementById('modalBody').innerHTML = html;
                 });
         }
+
 
         function closeDetail() {
             document.getElementById('modalDetail').classList.add('hidden');
@@ -645,6 +683,119 @@
 
         function closeEdit() {
             document.getElementById('modalEdit').classList.add('hidden');
+        }
+
+        // Pastikan SweetAlert2 sudah tersedia (kamu sudah load file sweetalert2.min.js)
+        // Fungsi openQr(id) -> fetch detail and show QR modal
+        function openQr(id) {
+            // show modal + loading
+            document.getElementById('modalQr').classList.remove('hidden');
+            document.getElementById('modalQrLoading').classList.remove('hidden');
+            document.getElementById('modalQrContent').classList.add('hidden');
+            document.getElementById('modalQrImage').src = '';
+
+            fetch(`/admin/acara/detail/${id}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (!res.success) {
+                        document.getElementById('modalQrLoading').innerHTML =
+                            "<div class='text-yellow-600'>Data tidak ditemukan</div>";
+                        return;
+                    }
+
+                    const acara = res.data;
+                    const qrUrl = acara.qr_image_url; // controller harus mengirim absolute URL (see earlier)
+                    if (!qrUrl) {
+                        document.getElementById('modalQrLoading').innerHTML =
+                            "<div class='text-yellow-600'>⚠️ Tidak ada QR Code</div>";
+                        return;
+                    }
+
+                    // set image src dan download link
+                    const img = document.getElementById('modalQrImage');
+                    img.src = qrUrl;
+                    img.onload = function() {
+                        document.getElementById('modalQrLoading').classList.add('hidden');
+                        document.getElementById('modalQrContent').classList.remove('hidden');
+                    };
+                    img.onerror = function() {
+                        document.getElementById('modalQrLoading').innerHTML =
+                            "<div class='text-red-600'>Gagal memuat gambar</div>";
+                    };
+
+                    // set download link
+                    const downloadLink = document.getElementById('modalQrDownload');
+                    // buat nama file yang ramah
+                    const filename = (acara.qr_token ? acara.qr_token : 'qr') + '.png';
+                    downloadLink.href = qrUrl;
+                    downloadLink.setAttribute('download', filename);
+                })
+                .catch(err => {
+                    document.getElementById('modalQrLoading').innerHTML =
+                        "<div class='text-red-600'>Terjadi kesalahan</div>";
+                    console.error(err);
+                });
+        }
+
+        function closeQr() {
+            document.getElementById('modalQr').classList.add('hidden');
+            document.getElementById('modalQrLoading').classList.remove('hidden');
+            document.getElementById('modalQrContent').classList.add('hidden');
+            document.getElementById('modalQrImage').src = '';
+        }
+
+        // ===== Delete with SweetAlert and AJAX =====
+        function deleteWithConfirm(id) {
+            // tampilkan konfirmasi
+            Swal.fire({
+                title: 'Yakin ingin menghapus?',
+                text: "Data acara dan QR akan dihapus permanen.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#d33'
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                // kirim request DELETE ke server
+                fetch(`/admin/acara/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Terhapus',
+                                text: data.message ?? 'Acara berhasil dihapus',
+                                timer: 1200,
+                                showConfirmButton: false
+                            }).then(() => {
+                                // opsi: reload halaman atau hapus baris tabel via DOM
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message ?? 'Gagal menghapus acara'
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan koneksi'
+                        });
+                    });
+            });
         }
     </script>
 
