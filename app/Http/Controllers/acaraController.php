@@ -187,6 +187,67 @@ class AcaraController extends Controller
     }
 
 
+    /**
+     * Halaman Edit (dipanggil via AJAX)
+     */
+    public function edit($id)
+    {
+        $acara = Acara::with([
+            'undangan.pegawai.orang',
+            'undangan.pegawai.unit'
+        ])->findOrFail($id);
+
+        $pegawai = Pegawai::with(['orang', 'unit'])->get();
+
+        return response()->json([
+            'success' => true,
+            'acara' => $acara,
+            'pegawai' => $pegawai,
+        ]);
+    }
+
+
+
+    /** UPDATE ACARA */
+    public function update(Request $request, $id)
+    {
+        $acara = Acara::findOrFail($id);
+
+
+        $request->validate([
+            'nama_acara' => 'required|string',
+            'lokasi' => 'required|string',
+            'pegawai' => 'array',
+        ]);
+
+
+        $acara->update([
+            'nama_acara' => $request->nama_acara,
+            'lokasi' => $request->lokasi,
+        ]);
+
+
+        /* ============================
+        Update Undangan (Jika KHUSUS)
+        ============================= */
+        if ($acara->tipe_audiens === 'KHUSUS') {
+            AcaraUndangan::where('acara_id', $acara->id)->delete();
+
+
+            if ($request->pegawai) {
+                foreach ($request->pegawai as $p) {
+                    AcaraUndangan::create([
+                        'acara_id' => $acara->id,
+                        'id_pegawai' => $p,
+                    ]);
+                }
+            }
+        }
+
+
+        return response()->json(['success' => true]);
+    }
+
 
     /**
      * DETAIL ACARA (AJAX JSON)

@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <link rel="stylesheet" href="{{ asset('assets/css/selectize/selectize.bootstrap5.css') }}">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -57,6 +59,10 @@
     <script src="{{ asset('assets/js/jquery-ui/jquery-ui.min.js') }}"></script>
     {{-- sweetalert2 --}}
     <script src="{{ asset('assets/js/sweetalert/sweetalert2.min.js') }}"></script>
+
+    <script src="{{ asset('assets/js/selectize/selectize.js') }}"></script>
+
+    <script src="{{ asset('assets/js/acara/acara.js') }}"></script>
 
     <!-- Additional Scripts from Pages -->
     @stack('scripts')

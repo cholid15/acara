@@ -55,6 +55,12 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->group(fu
     // ACARA CRUD
     Route::get('/acara/create', [AcaraController::class, 'create'])->name('admin.acara.create');
     Route::post('/acara/store', [AcaraController::class, 'store'])->name('admin.acara.store');
+
+    Route::post('/acara/update/{id}', [AcaraController::class, 'update'])
+        ->name('admin.acara.update');
+    Route::get('/acara/edit/{id}', [AcaraController::class, 'edit'])
+        ->name('admin.acara.edit');
+
     // <-- pastikan ini ada:
     Route::get('/acara/unit/{unit_id}/pegawai', [AcaraController::class, 'getPegawaiByUnit']);
     // AJAX: Ambil pegawai berdasarkan unit

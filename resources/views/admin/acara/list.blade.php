@@ -294,8 +294,7 @@
                                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </a>
-
-                                            <a href="" {{-- <a href="{{ route('admin.acara.edit', $item->id) }}" --}}
+                                            <a href="javascript:void(0)" onclick="openEdit({{ $item->id }})"
                                                 class="text-yellow-600 hover:text-yellow-900 transition"
                                                 title="Edit">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
@@ -391,6 +390,49 @@
     </div>
 
 
+
+    <!-- ===================================================================== -->
+    <!-- BLADE VIEW (list.blade.php) - Tambahan Modal EDIT -->
+    <!-- ===================================================================== -->
+    <div id="modalEdit" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div class="bg-white w-11/12 lg:w-1/2 rounded-lg shadow-lg">
+            <div class="p-5 border-b">
+                <h3 class="text-xl font-semibold">Edit Acara</h3>
+            </div>
+
+
+            <form id="formEdit" class="p-5 space-y-4">
+                <input type="hidden" id="edit_id">
+
+
+                <div>
+                    <label>Nama Acara</label>
+                    <input id="edit_nama_acara" class="w-full border rounded p-2" />
+                </div>
+
+
+                <div>
+                    <label>Lokasi</label>
+                    <input id="edit_lokasi" class="w-full border rounded p-2" />
+                </div>
+
+
+                <div id="edit_pegawai_wrapper" class="hidden">
+                    <label>Pegawai (Khusus)</label>
+                    <select id="edit_pegawai" multiple class="w-full"></select>
+                </div>
+
+
+                <div class="text-right border-t pt-4">
+                    <button type="button" onclick="closeEdit()"
+                        class="px-4 py-2 bg-gray-600 text-white rounded">Tutup</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <script>
         function showDetail(id) {
 
@@ -480,6 +522,129 @@
 
         function closeDetail() {
             document.getElementById('modalDetail').classList.add('hidden');
+        }
+
+        function openEdit(id) {
+
+            // buka modal
+            document.getElementById('modalEdit').classList.remove('hidden');
+
+            // tampilkan loading dikit
+            document.getElementById('edit_nama_acara').value = "Loading...";
+            document.getElementById('edit_lokasi').value = "Loading...";
+
+            fetch(`/admin/acara/edit/${id}`)
+                .then(res => res.json())
+                .then(res => {
+
+                    let acara = res.acara;
+                    let pegawai = res.pegawai;
+
+                    // isi form
+                    document.getElementById('edit_id').value = acara.id;
+                    document.getElementById('edit_nama_acara').value = acara.nama_acara;
+                    document.getElementById('edit_lokasi').value = acara.lokasi;
+
+                    // select pegawai
+                    let select = document.getElementById('edit_pegawai');
+                    select.innerHTML = "";
+
+                    pegawai.forEach(p => {
+                        let option = document.createElement('option');
+                        option.value = p.id;
+                        option.text = `${p.orang?.nama ?? ''} - ${p.unit?.nama ?? ''}`;
+                        select.appendChild(option);
+                    });
+
+                    // kalau audiens KHUSUS → tampilkan Selectize
+                    if (acara.tipe_audiens === 'KHUSUS') {
+
+                        document.getElementById('edit_pegawai_wrapper').classList.remove('hidden');
+
+                        let selectedIDs = acara.undangan.map(u => u.id_pegawai);
+
+                        // harus reset dulu
+                        if ($('#edit_pegawai')[0].selectize) {
+                            $('#edit_pegawai')[0].selectize.destroy();
+                        }
+
+                        $('#edit_pegawai').selectize({
+                            plugins: ['remove_button'],
+                            persist: false,
+                            create: false
+                        });
+
+                        let sel = $('#edit_pegawai')[0].selectize;
+                        sel.setValue(selectedIDs);
+                    }
+                });
+        }
+
+
+        // Submit update
+
+        document.getElementById('formEdit').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let id = document.getElementById('edit_id').value;
+            let data = new FormData();
+
+            data.append('nama_acara', document.getElementById('edit_nama_acara').value);
+            data.append('lokasi', document.getElementById('edit_lokasi').value);
+
+            let pegawaiSelectize = $('#edit_pegawai')[0]?.selectize;
+            if (pegawaiSelectize) {
+                let values = pegawaiSelectize.getValue();
+                values.forEach(v => data.append('pegawai[]', v));
+            }
+
+            fetch(`/admin/acara/update/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: data
+                })
+                .then(res => res.json())
+                .then(res => {
+
+                    // ❌ gagal
+                    if (!res.success) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: res.message ?? 'Terjadi kesalahan saat menyimpan data.',
+                            confirmButtonColor: '#d33'
+                        });
+                        return;
+                    }
+
+                    // ✅ berhasil
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Data acara berhasil diperbarui.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        closeEdit(); // tutup modal
+                        location.reload(); // reload halaman
+                    });
+
+                })
+                .catch(() => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Tidak dapat terhubung ke server.',
+                        confirmButtonColor: '#d33'
+                    });
+                });
+        });
+
+
+        function closeEdit() {
+            document.getElementById('modalEdit').classList.add('hidden');
         }
     </script>
 
