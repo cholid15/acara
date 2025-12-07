@@ -60,9 +60,7 @@
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-gray-600">Total Acara</p>
-                                <p class="text-2xl font-semibold text-gray-900">
-                                    {{ $totalAcara }}
-                                </p>
+                                <p class="text-2xl font-semibold text-gray-900">24</p>
                             </div>
                         </div>
                     </div>
@@ -81,9 +79,7 @@
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-gray-600">Acara Aktif</p>
-                                <p class="text-2xl font-semibold text-gray-900">
-                                    {{ $totalDraft }}
-                                </p>
+                                <p class="text-2xl font-semibold text-gray-900">18</p>
                             </div>
                         </div>
                     </div>
@@ -102,9 +98,7 @@
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-gray-600">Total Undangan</p>
-                                <p class="text-2xl font-semibold text-gray-900">
-                                    {{ $totalUndangan }}
-                                </p>
+                                <p class="text-2xl font-semibold text-gray-900">342</p>
                             </div>
                         </div>
                     </div>

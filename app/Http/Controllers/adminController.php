@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Acara\Acara;
+use App\Models\Acara\AcaraUndangan;
 use App\Models\User;
 
 class adminController extends Controller
@@ -37,11 +38,22 @@ class adminController extends Controller
         // $acara = Acara::orderBy('created_at', 'desc')->simplePaginate(2);
         $acara = Acara::orderBy('created_at', 'desc')->paginate(2);
 
+        // Hitung total semua acara (tanpa pagination)
+        $totalAcara = Acara::count();
+
+        // ✅ total semua undangan
+        $totalUndangan = AcaraUndangan::count();
+
+        // ✅ total acara dengan status DRAFT
+        $totalDraft = Acara::where('status', 'DRAFT')->count();
 
         // Return view - data bisa diakses langsung di blade via auth()->user()
         return view('admin.dashboard', [
             'user' => $user,
             'acara' => $acara,
+            'totalAcara' => $totalAcara,
+            'totalUndangan' => $totalUndangan,
+            'totalDraft' => $totalDraft,
         ]);
     }
 
