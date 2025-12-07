@@ -255,8 +255,8 @@
 
                     {{-- Pagination --}}
                     @if ($acara->hasPages())
-                        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                            {{ $acara->links() }}
+                        <div class="bg-white px-4 py-3 border-top">
+                            {{ $acara->links('pagination::bootstrap-5') }}
                         </div>
                     @endif
 

@@ -34,7 +34,9 @@ class adminController extends Controller
         }
 
         // Ambil data acara berurutan dari terbaru + pagination
+        // $acara = Acara::orderBy('created_at', 'desc')->simplePaginate(2);
         $acara = Acara::orderBy('created_at', 'desc')->paginate(2);
+
 
         // Return view - data bisa diakses langsung di blade via auth()->user()
         return view('admin.dashboard', [
