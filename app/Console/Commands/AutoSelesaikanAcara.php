@@ -36,3 +36,7 @@ class AutoSelesaikanAcara extends Command
         return Command::SUCCESS;
     }
 }
+
+
+//  php artisan schedule:work
+// diatas adalah perintah untuk menjalankan scheduler secara terus-menerus pada lingkungan pengembangan.
