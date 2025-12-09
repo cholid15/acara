@@ -119,6 +119,7 @@ function openEdit(id) {
             document.getElementById("edit_id").value = acara.id;
             document.getElementById("edit_nama_acara").value = acara.nama_acara;
             document.getElementById("edit_lokasi").value = acara.lokasi;
+            document.getElementById("edit_status").value = acara.status;
 
             // select pegawai
             let select = document.getElementById("edit_pegawai");
