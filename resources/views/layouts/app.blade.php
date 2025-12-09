@@ -62,7 +62,8 @@
 
     <script src="{{ asset('assets/js/selectize/selectize.js') }}"></script>
 
-    <script src="{{ asset('assets/js/acara/acara.js') }}"></script>
+
+
 
     <!-- Additional Scripts from Pages -->
     @stack('scripts')

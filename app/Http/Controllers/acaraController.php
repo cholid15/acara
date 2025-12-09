@@ -202,6 +202,7 @@ class AcaraController extends Controller
             'lokasi'        => $request->lokasi,
             'tipe_audiens'  => $request->tipe_audiens,
             'qr_token'      => Str::uuid(),
+            'status'        => 'aktif',
         ]);
 
         /* ===============================================================
@@ -295,12 +296,14 @@ class AcaraController extends Controller
             'nama_acara' => 'required|string',
             'lokasi' => 'required|string',
             'pegawai' => 'array',
+            'status'     => 'required|in:aktif,selesai,dibatalkan',
         ]);
 
 
         $acara->update([
             'nama_acara' => $request->nama_acara,
             'lokasi' => $request->lokasi,
+            'status'     => $request->status,
         ]);
 
 
