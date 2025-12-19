@@ -75,9 +75,9 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->group(fu
         ->name('admin.acara.destroy');
 });
 // Route khusus user
-// Route::get('/user', [adminController::class, 'userDashboard'])
-//     ->middleware(['auth', 'verified'])
-//     ->name('user.dashboard');
+Route::get('/user', [adminController::class, 'userDashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('user.dashboard');
 
 // daftar acara
 // Route::get('list', [adminController::class, 'list'])

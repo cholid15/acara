@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Acara\Acara;
 use App\Models\Acara\AcaraUndangan;
+use App\Models\Ref\Pegawai;
+
 use App\Models\User;
 
 class adminController extends Controller
@@ -65,12 +67,55 @@ class adminController extends Controller
             abort(401, 'Anda belum login.');
         }
 
+        // Ambil id_pegawai user
+        $idPegawai = $user->id_pegawai;
 
-        // Return view - data bisa diakses langsung di blade via auth()->user()
+        // Ambil pegawai → untuk id_unit
+        $pegawai = Pegawai::find($idPegawai);
+
+        if (!$pegawai) {
+            abort(404, 'Data pegawai tidak ditemukan.');
+        }
+
+        $idUnitUser = $pegawai->id_unit;
+
+        // Hitung jumlah undangan user
+        $jumlahUndangan = AcaraUndangan::where('id_pegawai', $idPegawai)->count();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Ambil acara untuk dashboard user:
+    |--------------------------------------------------------------------------
+    |  1. Acara untuk unit user (filter_unit_id = id_unit)
+    |  2. Acara yang user diundang (dari tabel acara_undangan)
+    |  3. Dalam 2 minggu ke depan
+    |  4. Maksimal 3 acara terdekat
+    |--------------------------------------------------------------------------
+    */
+
+        $acaraTerdekat = Acara::whereBetween('tanggal_waktu', [
+            now(),
+            now()->addDays(14)
+        ])
+            ->where(function ($query) use ($idUnitUser, $idPegawai) {
+                $query->where('filter_unit_id', $idUnitUser) // kondisi 1
+                    ->orWhereHas('undangan', function ($q) use ($idPegawai) { // kondisi 2
+                        $q->where('id_pegawai', $idPegawai);
+                    });
+            })
+            ->orderBy('tanggal_waktu', 'asc')
+            ->take(3)
+            ->get();
+
         return view('user.dashboard', [
             'user' => $user,
+            'jumlahUndangan' => $jumlahUndangan,
+            'acaraTerdekat' => $acaraTerdekat,
         ]);
     }
+
+
+
 
 
     /**

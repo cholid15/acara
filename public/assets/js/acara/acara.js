@@ -45,30 +45,34 @@ $(document).ready(function () {
     // ================================================
     $("#formAcara").on("submit", function (e) {
         e.preventDefault();
-        e.stopImmediatePropagation(); // ✅ TAMBAHAN: Stop event bubbling
+        e.stopImmediatePropagation();
 
-        // Disable tombol submit untuk mencegah double click
         let submitBtn = $(this).find('button[type="submit"]');
         submitBtn.prop("disabled", true);
 
         let formData = $(this).serialize();
 
-        // SWEETALERT LOADING SPINNER
+        // Mulai timer 1 detik
+        let startTime = Date.now();
+
         Swal.fire({
             title: "Menyimpan...",
             text: "Mohon tunggu sebentar",
             allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            },
-            timer: 1000,
-        }).then(() => {
-            // Setelah 1 detik → Jalankan AJAX
-            $.ajax({
-                url: "/admin/acara/store",
-                type: "POST",
-                data: formData,
-                success: function () {
+            didOpen: () => Swal.showLoading(),
+        });
+
+        // Jalankan AJAX SEGERA
+        $.ajax({
+            url: "/admin/acara/store",
+            type: "POST",
+            data: formData,
+            success: function () {
+                // Hitung sisa waktu agar total minimal 1 detik
+                let elapsed = Date.now() - startTime;
+                let remaining = Math.max(0, 1000 - elapsed);
+
+                setTimeout(() => {
                     Swal.fire({
                         icon: "success",
                         title: "Berhasil!",
@@ -78,11 +82,16 @@ $(document).ready(function () {
                     }).then(() => {
                         window.location.href = "/admin/acara/create";
                     });
-                },
-                error: function (xhr) {
-                    // Re-enable button jika error
-                    submitBtn.prop("disabled", false);
+                }, remaining);
+            },
 
+            error: function (xhr) {
+                submitBtn.prop("disabled", false);
+
+                let elapsed = Date.now() - startTime;
+                let remaining = Math.max(0, 1000 - elapsed);
+
+                setTimeout(() => {
                     // VALIDASI 422
                     if (xhr.status === 422) {
                         let errors = xhr.responseJSON.errors;
@@ -97,16 +106,17 @@ $(document).ready(function () {
                         });
                         return;
                     }
+
                     // ERROR SERVER
                     Swal.fire({
                         icon: "error",
                         title: "Gagal!",
                         text: "Terjadi kesalahan, coba lagi.",
                     });
-                },
-            });
+                }, remaining);
+            },
         });
 
-        return false; // ✅ TAMBAHAN: Extra protection
+        return false;
     });
 });
