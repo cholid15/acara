@@ -27,14 +27,14 @@
                         <h4 class="font-semibold text-gray-800 text-lg">Acara yang Diikuti</h4>
                         <span
                             class="bg-indigo-600 text-white text-2xl font-bold px-5 py-2 rounded-full min-w-[60px] text-center shadow-lg">
-                            {{ $jumlahAcaraDiikuti ?? 12 }}
+                            {{ $jumlahAcaraDiikuti ?? 0 }}
                         </span>
                     </div>
-                    <p class="text-gray-500 text-sm mb-4">Lihat daftar acara yang kamu ikuti</p>
+                    {{-- <p class="text-gray-500 text-sm mb-4">Lihat daftar acara yang kamu ikuti</p>
                     <a href="#"
                         class="inline-block px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg">
                         Lihat Acara
-                    </a>
+                    </a> --}}
                 </div>
 
                 <!-- Undangan -->
@@ -47,11 +47,11 @@
                             {{ $jumlahUndangan ?? 5 }}
                         </span>
                     </div>
-                    <p class="text-gray-500 text-sm mb-4">Cek undangan acara untukmu</p>
+                    {{-- <p class="text-gray-500 text-sm mb-4">Cek undangan acara untukmu</p>
                     <a href="#"
                         class="inline-block px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg">
                         Lihat Undangan
-                    </a>
+                    </a> --}}
                 </div>
             </div>
 
@@ -61,7 +61,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <!-- Scan QR -->
                     <a href="#"
-                        class="flex flex-col items-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-xl transition-all duration-200 group">
+                        class="btn-scan-qr  flex flex-col items-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-xl transition-all duration-200 group">
                         <div
                             class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,7 +239,7 @@
             <div class="flex-1 flex justify-center">
                 <a href="#" class="relative -top-6">
                     <div
-                        class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full shadow-2xl flex items-center justify-center transform transition-all duration-200 active:scale-95">
+                        class="btn-scan-qr  w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full shadow-2xl flex items-center justify-center transform transition-all duration-200 active:scale-95">
                         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z">
@@ -271,4 +271,26 @@
             </a>
         </div>
     </div>
+
+
+    <!-- Modal Scan QR -->
+    <div id="modal-scan" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-4 w-full max-w-md relative">
+            <h3 class="text-lg font-semibold mb-3 text-center">Scan QR Absensi</h3>
+
+            <div id="qr-reader" class="w-full"></div>
+
+            <button id="close-scan" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800">
+                ✕
+            </button>
+        </div>
+    </div>
+
+
+
+
+    @push('scripts')
+        <script src="{{ asset('assets/js/acara/html5-qrcode.min.js') }}"></script>
+        <script src="{{ asset('assets/js/acara/qr_code.js') }}"></script>
+    @endpush
 </x-app-layout>

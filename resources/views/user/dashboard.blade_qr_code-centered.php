@@ -27,7 +27,7 @@
                         <h4 class="font-semibold text-gray-800 text-lg">Acara yang Diikuti</h4>
                         <span
                             class="bg-indigo-600 text-white text-2xl font-bold px-5 py-2 rounded-full min-w-[60px] text-center shadow-lg">
-                            {{ $jumlahAcaraDiikuti ?? 12 }}
+                            {{ $jumlahAcaraDiikuti ?? 122 }}
                         </span>
                     </div>
                     <p class="text-gray-500 text-sm mb-4">Lihat daftar acara yang kamu ikuti</p>
@@ -140,16 +140,14 @@
                                 <h4 class="text-base font-semibold text-gray-800 mb-1">Workshop Laravel Advanced</h4>
                                 <div class="flex flex-wrap gap-2 text-sm text-gray-600">
                                     <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         09:00 - 12:00
                                     </span>
                                     <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
                                             </path>
@@ -183,16 +181,14 @@
                                 <h4 class="text-base font-semibold text-gray-800 mb-1">Seminar Teknologi 2024</h4>
                                 <div class="flex flex-wrap gap-2 text-sm text-gray-600">
                                     <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         13:00 - 16:00
                                     </span>
                                     <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
                                             </path>
@@ -226,16 +222,14 @@
                                 <h4 class="text-base font-semibold text-gray-800 mb-1">Rapat Koordinasi Internal</h4>
                                 <div class="flex flex-wrap gap-2 text-sm text-gray-600">
                                     <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         08:00 - 10:00
                                     </span>
                                     <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
                                             </path>
