@@ -15,6 +15,15 @@ class AcaraUndangan extends Model
         'user_id',
     ];
 
+    public function acara()
+    {
+        return $this->belongsTo(
+            Acara::class,
+            'acara_id', // FK BENAR
+            'id'
+        );
+    }
+
 
     public function pegawai()
     {

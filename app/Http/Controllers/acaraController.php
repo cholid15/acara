@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\acara\Acara;
 use App\Models\acara\AcaraUndangan;
+use App\Models\Acara\KehadiranAcara;
 use App\Models\ref\Pegawai;
 use App\Models\ref\Unit;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use Illuminate\Support\Facades\DB;
 
 class AcaraController extends Controller
 {
@@ -389,5 +391,122 @@ class AcaraController extends Controller
             Log::error('Failed to delete acara ID ' . $id . ': ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Gagal menghapus acara: ' . $e->getMessage()], 500);
         }
+    }
+
+
+
+    public function scanAjax(Request $request, $token)
+    {
+        $user = auth()->user();
+
+        $acara = Acara::where('qr_token', $token)
+            ->where('status', 'aktif')
+            ->first();
+
+        if (!$acara) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Acara tidak ditemukan atau sudah tidak aktif'
+            ], 404);
+        }
+
+        // ===============================
+        // AMBIL DATA PEGAWAI
+        // ===============================
+        $pegawai = $user->pegawai; // sekarang SUDAH ADA
+        $userUnitId = $pegawai?->id_unit;
+
+        // DEBUG (sementara)
+        Log::info('DEBUG SCAN QR', [
+            'user_id'        => $user->id,
+            'id_pegawai'     => $user->id_pegawai,
+            'user_unit_id'   => $userUnitId,
+            'filter_unit_id' => $acara->filter_unit_id,
+            'tipe_audiens'   => $acara->tipe_audiens,
+        ]);
+
+        // ===============================
+        // VALIDASI TIPE AUDIENS
+        // ===============================
+        switch ($acara->tipe_audiens) {
+
+            case 'KHUSUS':
+                if (!$pegawai || !$userUnitId) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Acara ini hanya untuk pegawai tertentu'
+                    ], 403);
+                }
+
+                if ((int)$userUnitId !== (int)$acara->filter_unit_id) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Unit kamu tidak terdaftar di acara ini'
+                    ], 403);
+                }
+                break;
+
+            case 'PER_UNIT':
+                if (!$pegawai || !$userUnitId) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Acara ini hanya untuk pegawai internal'
+                    ], 403);
+                }
+
+                if ((int)$userUnitId !== (int)$acara->filter_unit_id) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Acara ini khusus unit tertentu'
+                    ], 403);
+                }
+                break;
+
+            case 'SEMUA_INTERNAL':
+                if (!$pegawai) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Acara ini hanya untuk pegawai internal'
+                    ], 403);
+                }
+                break;
+
+            case 'PUBLIK':
+                // bebas
+                break;
+        }
+
+        // ===============================
+        // CEGAH ABSEN GANDA
+        // ===============================
+        $sudahHadir = KehadiranAcara::where('acara_id', $acara->id)
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if ($sudahHadir) {
+            return response()->json([
+                'status' => 'warning',
+                'message' => 'Kamu sudah melakukan absensi',
+                'acara' => $acara
+            ]);
+        }
+
+        // ===============================
+        // SIMPAN ABSENSI
+        // ===============================
+        KehadiranAcara::create([
+            'acara_id'      => $acara->id,
+            'user_id'       => $user->id,
+            'nama_tamu'     => $user->name,
+            'instansi_tamu' => $pegawai->id_unit, // atau relasi unit->nama
+            'waktu_scan'    => now(),
+            'device_info'   => $request->userAgent(),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Absensi berhasil',
+            'acara' => $acara
+        ]);
     }
 }

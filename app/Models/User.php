@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Ref\Pegawai;
 
 class User extends Authenticatable
 {
@@ -44,4 +45,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // =====================================================
+    // RELASI KE PEGAWAI (INI YANG KEMARIN BIKIN NULL)
+    // =====================================================
+    public function pegawai()
+    {
+        return $this->belongsTo(
+            Pegawai::class, // ✅ BENAR
+            'id_pegawai',   // FK di users
+            'id'            // PK di ms_pegawai
+        );
+    }
 }

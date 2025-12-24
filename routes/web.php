@@ -43,6 +43,25 @@ Route::middleware('auth')->group(function () {
 });
 
 
+// routes/web.php
+
+Route::middleware('auth')
+    ->prefix('acara')
+    ->name('acara.')
+    ->group(function () {
+
+        // Scan QR
+        // Route::get('/qr/{token}', [AcaraController::class, 'scan'])
+        //     ->name('scan');
+
+        // Info acara
+        Route::get('/{id}', [AcaraController::class, 'info'])
+            ->name('info');
+
+        // AJAX scan QR
+        Route::post('/qr/{token}', [AcaraController::class, 'scanAjax'])
+            ->name('scan.ajax');
+    });
 
 
 

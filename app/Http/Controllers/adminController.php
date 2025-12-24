@@ -59,64 +59,51 @@ class adminController extends Controller
         ]);
     }
 
+
     public function userDashboard()
     {
         $user = auth()->user();
-
         if (!$user) {
             abort(401, 'Anda belum login.');
         }
 
-        // Ambil id_pegawai user
         $idPegawai = $user->id_pegawai;
-
-        // Ambil pegawai → untuk id_unit
-        $pegawai = Pegawai::find($idPegawai);
-
-        if (!$pegawai) {
-            abort(404, 'Data pegawai tidak ditemukan.');
-        }
-
+        $pegawai = Pegawai::findOrFail($idPegawai);
         $idUnitUser = $pegawai->id_unit;
 
-        // Hitung jumlah undangan user
+        // Hitung undangan khusus
         $jumlahUndangan = AcaraUndangan::where('id_pegawai', $idPegawai)->count();
 
-        /*
-    |--------------------------------------------------------------------------
-    | Ambil acara untuk dashboard user:
-    |--------------------------------------------------------------------------
-    |  1. Acara untuk unit user (filter_unit_id = id_unit)
-    |  2. Acara yang user diundang (dari tabel acara_undangan)
-    |  3. Dalam 2 minggu ke depan
-    |  4. Maksimal 3 acara terdekat
-    |--------------------------------------------------------------------------
-    */
+        $acaraTerkait = Acara::where(function ($query) use ($idUnitUser, $idPegawai) {
+            // 🔹 SEMUA_INTERNAL
+            $query->where('tipe_audiens', 'SEMUA_INTERNAL')
 
-        $acaraTerdekat = Acara::whereBetween('tanggal_waktu', [
-            now(),
-            now()->addDays(14)
-        ])
-            ->where(function ($query) use ($idUnitUser, $idPegawai) {
-                $query->where('filter_unit_id', $idUnitUser) // kondisi 1
-                    ->orWhereHas('undangan', function ($q) use ($idPegawai) { // kondisi 2
-                        $q->where('id_pegawai', $idPegawai);
-                    });
-            })
+                // 🔹 PUBLIK
+                ->orWhere('tipe_audiens', 'PUBLIK')
+
+                // 🔹 PER_UNIT (sesuai unit user)
+                ->orWhere(function ($q) use ($idUnitUser) {
+                    $q->where('tipe_audiens', 'PER_UNIT')
+                        ->where('filter_unit_id', $idUnitUser);
+                })
+
+                // 🔹 KHUSUS (ada di tabel undangan)
+                ->orWhere(function ($q) use ($idPegawai) {
+                    $q->where('tipe_audiens', 'KHUSUS')
+                        ->whereHas('undangan', function ($u) use ($idPegawai) {
+                            $u->where('id_pegawai', $idPegawai);
+                        });
+                });
+        })
             ->orderBy('tanggal_waktu', 'asc')
-            ->take(3)
             ->get();
 
         return view('user.dashboard', [
-            'user' => $user,
+            'user'           => $user,
             'jumlahUndangan' => $jumlahUndangan,
-            'acaraTerdekat' => $acaraTerdekat,
+            'acaraTerkait'   => $acaraTerkait,
         ]);
     }
-
-
-
-
 
     /**
      * Display a listing of acara

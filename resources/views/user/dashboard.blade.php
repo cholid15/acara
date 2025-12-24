@@ -127,7 +127,7 @@
                 <!-- Dummy Acara Cards -->
                 <div class="space-y-4">
 
-                    @forelse ($acaraTerdekat as $acara)
+                    @forelse ($acaraTerkait as $acara)
                         <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                             <div class="flex items-start space-x-4">
                                 <div class="flex-shrink-0">
@@ -283,6 +283,26 @@
             <button id="close-scan" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800">
                 ✕
             </button>
+        </div>
+    </div>
+
+
+    <!-- Modal Info Acara -->
+    <div id="modal-info" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-lg relative">
+            <button id="close-info" class="absolute top-3 right-3 text-gray-500">✕</button>
+
+            <h3 class="text-xl font-bold mb-4" id="info-nama"></h3>
+
+            <div class="space-y-2 text-gray-700">
+                <p><strong>Tanggal:</strong> <span id="info-tanggal"></span></p>
+                <p><strong>Lokasi:</strong> <span id="info-lokasi"></span></p>
+                <p><strong>Status:</strong> <span id="info-status"></span></p>
+            </div>
+
+            <div class="mt-4 text-green-600 font-semibold">
+                ✔ Kehadiran kamu sudah tercatat
+            </div>
         </div>
     </div>
 
