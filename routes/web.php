@@ -98,6 +98,12 @@ Route::get('/user', [adminController::class, 'userDashboard'])
     ->middleware(['auth', 'verified'])
     ->name('user.dashboard');
 
+Route::get('user/profile', [adminController::class, 'userProfile'])
+    ->middleware(['auth', 'verified'])
+    ->name('user.profile');
+
+
+
 // daftar acara
 // Route::get('list', [adminController::class, 'list'])
 //     ->middleware(['auth', 'verified', 'role:admin'])

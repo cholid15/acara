@@ -20,4 +20,9 @@ class KehadiranAcara extends Model
     ];
 
     public $timestamps = false; // karena tabel kehadiran biasanya log tanpa created_at / updated_at
+
+    public function acara()
+    {
+        return $this->belongsTo(Acara::class, 'acara_id', 'id');
+    }
 }

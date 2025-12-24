@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Acara\Acara;
 use App\Models\Acara\AcaraUndangan;
+use App\Models\Acara\KehadiranAcara;
 use App\Models\Ref\Pegawai;
 
 use App\Models\User;
@@ -74,34 +75,49 @@ class adminController extends Controller
         // Hitung undangan khusus
         $jumlahUndangan = AcaraUndangan::where('id_pegawai', $idPegawai)->count();
 
-        $acaraTerkait = Acara::where(function ($query) use ($idUnitUser, $idPegawai) {
-            // 🔹 SEMUA_INTERNAL
-            $query->where('tipe_audiens', 'SEMUA_INTERNAL')
+        $acaraTerkait = Acara::with('kehadiran')
+            ->where(function ($query) use ($idUnitUser, $idPegawai) {
 
-                // 🔹 PUBLIK
-                ->orWhere('tipe_audiens', 'PUBLIK')
+                $query->where('tipe_audiens', 'SEMUA_INTERNAL')
+                    ->orWhere('tipe_audiens', 'PUBLIK')
 
-                // 🔹 PER_UNIT (sesuai unit user)
-                ->orWhere(function ($q) use ($idUnitUser) {
-                    $q->where('tipe_audiens', 'PER_UNIT')
-                        ->where('filter_unit_id', $idUnitUser);
-                })
+                    ->orWhere(function ($q) use ($idUnitUser) {
+                        $q->where('tipe_audiens', 'PER_UNIT')
+                            ->where('filter_unit_id', $idUnitUser);
+                    })
 
-                // 🔹 KHUSUS (ada di tabel undangan)
-                ->orWhere(function ($q) use ($idPegawai) {
-                    $q->where('tipe_audiens', 'KHUSUS')
-                        ->whereHas('undangan', function ($u) use ($idPegawai) {
-                            $u->where('id_pegawai', $idPegawai);
-                        });
-                });
-        })
+                    ->orWhere(function ($q) use ($idPegawai) {
+                        $q->where('tipe_audiens', 'KHUSUS')
+                            ->whereHas('undangan', function ($u) use ($idPegawai) {
+                                $u->where('id_pegawai', $idPegawai);
+                            });
+                    });
+            })
             ->orderBy('tanggal_waktu', 'asc')
             ->get();
+
 
         return view('user.dashboard', [
             'user'           => $user,
             'jumlahUndangan' => $jumlahUndangan,
             'acaraTerkait'   => $acaraTerkait,
+        ]);
+    }
+
+
+    public function userProfile()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            abort(401, 'Anda belum login.');
+        }
+
+        $idPegawai = $user->id_pegawai;
+        $pegawai = Pegawai::findOrFail($idPegawai);
+
+        return view('user.profile', [
+            'user' => $user,
+            'pegawai' => $pegawai,
         ]);
     }
 

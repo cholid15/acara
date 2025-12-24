@@ -413,10 +413,10 @@ class AcaraController extends Controller
         // ===============================
         // AMBIL DATA PEGAWAI
         // ===============================
-        $pegawai = $user->pegawai; // sekarang SUDAH ADA
+        $pegawai = $user->pegawai;
         $userUnitId = $pegawai?->id_unit;
 
-        // DEBUG (sementara)
+        // DEBUG
         Log::info('DEBUG SCAN QR', [
             'user_id'        => $user->id,
             'id_pegawai'     => $user->id_pegawai,
@@ -431,17 +431,21 @@ class AcaraController extends Controller
         switch ($acara->tipe_audiens) {
 
             case 'KHUSUS':
-                if (!$pegawai || !$userUnitId) {
+                if (!$pegawai) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Acara ini hanya untuk pegawai tertentu'
                     ], 403);
                 }
 
-                if ((int)$userUnitId !== (int)$acara->filter_unit_id) {
+                $terdaftar = AcaraUndangan::where('acara_id', $acara->id)
+                    ->where('id_pegawai', $pegawai->id)
+                    ->exists();
+
+                if (!$terdaftar) {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'Unit kamu tidak terdaftar di acara ini'
+                        'message' => 'Kamu tidak terdaftar dalam undangan acara ini'
                     ], 403);
                 }
                 break;
@@ -454,7 +458,7 @@ class AcaraController extends Controller
                     ], 403);
                 }
 
-                if ((int)$userUnitId !== (int)$acara->filter_unit_id) {
+                if ((int) $userUnitId !== (int) $acara->filter_unit_id) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Acara ini khusus unit tertentu'
@@ -485,9 +489,9 @@ class AcaraController extends Controller
 
         if ($sudahHadir) {
             return response()->json([
-                'status' => 'warning',
+                'status'  => 'warning',
                 'message' => 'Kamu sudah melakukan absensi',
-                'acara' => $acara
+                'acara'   => $acara
             ]);
         }
 
@@ -498,15 +502,16 @@ class AcaraController extends Controller
             'acara_id'      => $acara->id,
             'user_id'       => $user->id,
             'nama_tamu'     => $user->name,
-            'instansi_tamu' => $pegawai->id_unit, // atau relasi unit->nama
+            'instansi_tamu' => $pegawai?->id_unit,
             'waktu_scan'    => now(),
             'device_info'   => $request->userAgent(),
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Absensi berhasil',
-            'acara' => $acara
+            'acara'   => $acara,
+            'acara_id' => $acara->id,
         ]);
     }
 }

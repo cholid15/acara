@@ -101,8 +101,11 @@
                     </a>
 
                     <!-- Profil -->
-                    <a href="{{ route('profile.edit') }}"
+                    {{-- <a href="{{ route('profile.show') }}"
+                        class="flex flex-col items-center p-4 bg-gradient-to-br from-pink-50 to-pink-100 hover:from-pink-100 hover:to-pink-200 rounded-xl transition-all duration-200 group"> --}}
+                    <a href="{{ route('user.profile') }}"
                         class="flex flex-col items-center p-4 bg-gradient-to-br from-pink-50 to-pink-100 hover:from-pink-100 hover:to-pink-200 rounded-xl transition-all duration-200 group">
+
                         <div
                             class="w-12 h-12 bg-pink-600 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,11 +127,12 @@
                     </a> --}}
                 </div>
 
-                <!-- Dummy Acara Cards -->
+                <!--  Acara Cards -->
                 <div class="space-y-4">
 
                     @forelse ($acaraTerkait as $acara)
-                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                            data-acara-id="{{ $acara->id }}"> {{-- ⬅️ TAMBAHAN --}}
                             <div class="flex items-start space-x-4">
                                 <div class="flex-shrink-0">
                                     @php
@@ -151,24 +155,11 @@
 
                                     <div class="flex flex-wrap gap-2 text-sm text-gray-600">
                                         <span class="flex items-center">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
                                             {{ $tanggal->format('H:i') }} -
                                             {{ \Carbon\Carbon::parse($acara->tanggal_waktu_akhir)->format('H:i') }}
                                         </span>
 
                                         <span class="flex items-center">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                                </path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            </svg>
                                             {{ $acara->lokasi }}
                                         </span>
                                     </div>
@@ -191,11 +182,22 @@
                                                 default:
                                                     $label = $acara->tipe_audiens;
                                             }
+
+                                            $sudahHadir = $acara->kehadiran
+                                                ->where('user_id', auth()->id())
+                                                ->isNotEmpty();
                                         @endphp
 
                                         <span
                                             class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
                                             {{ $label }}
+                                        </span>
+
+                                        {{-- FLAG --}}
+                                        <span
+                                            class="flag-hadir inline-block px-2 py-1 text-xs rounded ml-1
+                            {{ $sudahHadir ? 'bg-green-100 text-green-800 font-semibold' : 'bg-gray-100 text-gray-600' }}">
+                                            {{ $sudahHadir ? '✔ Sudah Hadir' : '⏳ Belum Hadir' }}
                                         </span>
                                     </div>
 
@@ -207,6 +209,8 @@
                         <p class="text-gray-500 text-sm">Tidak ada acara dalam 2 minggu ke depan.</p>
                     @endforelse
                 </div>
+
+
 
             </div>
         </div>
@@ -262,7 +266,9 @@
             </a>
 
             <!-- Profile -->
-            <a href="{{ route('profile.edit') }}" class="flex flex-col items-center justify-center flex-1 py-2">
+            {{-- <a href="{{ route('profile.show') }}"class="flex flex-col items-center justify-center flex-1 py-2"> --}}
+            <a href="{{ route('user.profile') }}" class="flex flex-col items-center justify-center flex-1 py-2">
+
                 <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>

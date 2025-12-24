@@ -46,6 +46,20 @@ $(document).ready(function () {
                                     : "Sudah Hadir"
                             );
 
+                            // ===============================
+                            // UPDATE FLAG HADIR (TANPA RELOAD)
+                            // ===============================
+                            let card = $(
+                                '[data-acara-id="' + res.acara_id + '"]'
+                            );
+                            let flag = card.find(".flag-hadir");
+
+                            flag.removeClass("bg-gray-100 text-gray-600")
+                                .addClass(
+                                    "bg-green-100 text-green-800 font-semibold"
+                                )
+                                .text("✔ Sudah Hadir");
+
                             $("#modal-info")
                                 .removeClass("hidden")
                                 .addClass("flex");

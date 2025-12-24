@@ -26,4 +26,9 @@ class Acara extends Model
     {
         return $this->hasMany(AcaraUndangan::class, 'acara_id', 'id');
     }
+
+    public function kehadiran()
+    {
+        return $this->hasMany(KehadiranAcara::class, 'acara_id', 'id');
+    }
 }
