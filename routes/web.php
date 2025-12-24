@@ -86,7 +86,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->group(fu
     Route::get('/acara/get-pegawai-by-unit/{unitId}', [AcaraController::class, 'getPegawaiByUnit']);
 
     // detail acara
-    Route::get('acara/detail/{id}', [\App\Http\Controllers\AcaraController::class, 'detail'])
+    Route::get('acara/detail/{id}', [AcaraController::class, 'detail'])
         ->name('admin.acara.detail');
 
 
